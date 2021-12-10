@@ -1,0 +1,12 @@
+---
+- name: Ensure Redis dir exists
+  file:
+    path: '/etc/redis'
+    state: directory
+
+- name: Copy redis.conf to Redis dir
+  become: yes
+  template: 
+    src: "{{ redis_version }}.conf.j2" 
+    dest: "/etc/redis/redis.conf"
+    mode: 0644

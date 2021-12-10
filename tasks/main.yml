@@ -1,0 +1,33 @@
+---
+- name: Install prerequisites
+  become: yes
+  import_tasks: prerequisites.yml
+
+- name: Install Redis
+  become: yes
+  import_tasks: redis_install.yml
+
+- name: Configure Redis
+  become: yes
+  import_tasks: redis_conf.yml
+
+- name: Configure redis.service
+  become: yes
+  import_tasks: redis_service.yml
+
+- name: Configure sysctl
+  become: yes
+  import_tasks: sysctl.yml
+  when: redis_add_optimizations|bool == true
+
+- name: Configure limits
+  become: yes
+  import_tasks: limits.yml
+  when: redis_add_optimizations|bool == true
+
+- name: Configure THP
+  become: yes
+  import_tasks: disable_thp.yml
+  when: redis_add_optimizations|bool == true
+
+

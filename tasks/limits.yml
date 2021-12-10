@@ -1,0 +1,14 @@
+---
+- name: Set soft limit for redis
+  lineinfile:
+    path: /etc/security/limits.conf
+    insertbefore:  '^# End of file'
+    line: 'redis soft nofile 65536'
+  notify: restart redis
+
+- name: Set hard limit for redis
+  lineinfile:
+    path: /etc/security/limits.conf
+    insertbefore:  '^# End of file'
+    line: 'redis hard nofile 65536'
+  notify: restart redis

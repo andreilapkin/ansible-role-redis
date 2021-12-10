@@ -1,0 +1,42 @@
+---
+- name: Check if Redis is already installed
+  stat:
+    path: "/usr/local/bin/redis-server"
+  register: redis_is_installed
+
+- name: Downloading Redis sources
+  get_url:
+    url: "{{ redis_tarball_url }}"
+    dest: "/tmp/{{ redis_version }}.tar.gz"
+    force: no
+  when: not redis_is_installed.stat.exists
+  register: redis_source
+
+- name: Unpacking Redis
+  unarchive:
+    dest: /tmp/
+    src: "{{ redis_source.dest }}"
+    remote_src: true
+  when: redis_source.changed
+  register: redis_source_unpack
+
+- name: Redis make
+  make:
+    chdir: "/tmp/{{ redis_version }}"
+  when: redis_source_unpack.changed
+  register: redis_make
+  
+
+- name: Redis make test
+  make:
+    chdir: "/tmp/{{ redis_version }}"
+    target: test
+  when: redis_make.changed
+  register: redis_make_test
+
+- name: Redis make install
+  make:
+    chdir: "/tmp/{{ redis_version }}"
+    target: install
+  when: redis_make_test.changed
+  register: redis_make_install

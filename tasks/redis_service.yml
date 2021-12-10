@@ -1,0 +1,39 @@
+---
+- name: Create redis group
+  user:
+    name: "{{ redis_group }}"
+    system: yes
+
+- name: Create redis user
+  user:
+    name: "{{ redis_user }}"
+    system: yes
+    create_home: no
+    group: "{{ redis_group }}"
+
+- name: Ensure target dir exists
+  file:
+    path: '/etc/systemd/system'
+    state: directory
+
+- name: Ensure redis data dir exists
+  file:
+    path: "{{ redis_dir }}"
+    state: directory
+    owner: "{{ redis_user }}"
+    group: "{{ redis_group }}"
+    mode: 0770
+
+- name: Copy redis.service file in place
+  become: yes
+  template: 
+    src: "redis.service.j2" 
+    dest: "/etc/systemd/system/redis.service"
+    mode: 0644
+  notify: restart redis
+
+- name: Start redis.service
+  service: 
+    name: redis 
+    state: started
+    enabled: yes

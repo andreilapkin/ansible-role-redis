@@ -1,0 +1,24 @@
+---
+- name: Ensure target dir exists
+  file:
+    path: '/etc/systemd/system'
+    state: directory
+
+- name: Set service to disable Transparent Huge Pages
+  become: yes
+  template: 
+    src: "disable-transparent-huge-pages.service.j2" 
+    dest: "/etc/systemd/system/disable-transparent-huge-pages.service"
+    mode: 0644
+
+- name: Check if disable-thp.service is already installed
+  stat:
+    path: "/etc/systemd/system/disable-transparent-huge-pages.service"
+  register: thp_is_installed
+
+- name: Start disable-transparent-huge-pages.service
+  service: 
+    name: disable-transparent-huge-pages 
+    state: started
+    enabled: yes
+  when: not thp_is_installed.stat.exists

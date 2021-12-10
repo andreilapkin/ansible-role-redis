@@ -1,0 +1,24 @@
+---
+- name: Set vm.overcommit_memory
+  sysctl:
+    name: vm.overcommit_memory
+    value: '0'
+    state: present
+    reload: yes
+  notify: restart redis
+
+- name: Set net.core.somaxconn
+  sysctl:
+    name: net.core.somaxconn
+    value: '1024'
+    state: present
+    reload: yes
+  notify: restart redis
+
+- name: Set fs.file-max
+  sysctl:
+    name: fs.file-max
+    value: '150000'
+    state: present
+    reload: yes
+  notify: restart redis
